@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class WxWeb {
+    static Map<String, Contact> contactMap = new HashMap<>();
     String domain = "https://wx2.qq.com";
     String prefix = "https://wx2.qq.com/cgi-bin/mmwebwx-bin";
     WebRequest webRequest = new DefaultWebRequest();
@@ -96,7 +97,7 @@ public class WxWeb {
         return null;
     }
 
-    void init(String passTicket, BaseRequest baseRequest) {
+    void init(BaseRequest baseRequest) {
         Map<String, Object> map = new HashMap<>();
         map.put("BaseRequest", baseRequest);
 
@@ -123,8 +124,10 @@ public class WxWeb {
         String body = webResponse.getBody();
         ContactRet contactRet = JsonConverter.jsonToObject(body, ContactRet.class);
         List<Contact> contacts = contactRet.getMemberList();
-        if (getAvatar) {
-            for (Contact contact : contacts) {
+        for (Contact contact : contacts) {
+            String username = contact.getUserName();
+            contactMap.put(username, contact);
+            if (getAvatar) {
                 try {
                     getUserAvatar(contact);
                 } catch (Exception e) {
@@ -200,8 +203,10 @@ public class WxWeb {
         String body = webResponse.getBody();
         GroupContactRet groupContactRet = JsonConverter.jsonToObject(body, GroupContactRet.class);
         List<Contact> contacts = groupContactRet.getContactList();
-        if (getAvatar) {
-            for (Contact contact : contacts) {
+        for (Contact contact : contacts) {
+            String username = contact.getUserName();
+            contactMap.put(username, contact);
+            if (getAvatar) {
                 try {
                     getUserAvatar(contact);
                 } catch (Exception e) {
@@ -211,7 +216,7 @@ public class WxWeb {
         }
     }
 
-    void getUserAvatar(Contact contact) throws IOException, InterruptedException {
+    void getUserAvatar(Contact contact) throws IOException {
         String username = contact.getUserName();
         String url = domain + contact.getHeadImgUrl();
         String filePath = String.format("/home/reghao/Downloads/wx/%s.jpg", username);
@@ -223,7 +228,9 @@ public class WxWeb {
         LoginRet loginRet = wxWeb.login();
         BaseRequest baseRequest = loginRet.getBaseRequest();
         String passTicket = loginRet.getPassTicket();
-        wxWeb.init(passTicket, baseRequest);
+        wxWeb.init(baseRequest);
         wxWeb.getUserContact(passTicket, baseRequest, true);
+
+        Thread.sleep(3600_000);
     }
 }

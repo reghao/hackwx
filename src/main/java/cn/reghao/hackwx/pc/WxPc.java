@@ -8,7 +8,7 @@ import java.io.IOException;
  * @author reghao
  * @date 2021-11-26 14:05:59
  */
-public class HackWx {
+public class WxPc {
     public static void main(String[] args) {
         String dirPath = "/home/reghao/data/dl/wx/Image";
         WxdatFileHandler wxdatFileHandler = new WxdatFileHandler();
