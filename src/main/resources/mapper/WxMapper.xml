@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.reghao.jdemo.spring.wx.mapper.WxMapper">
+    <resultMap id="contactMap" type="cn.reghao.hackwx.android.model.WxContact">
+        <result property="username" column="username"/>
+        <result property="alias" column="alias"/>
+        <result property="conRemark" column="conRemark"/>
+        <result property="nickname" column="nickname"/>
+    </resultMap>
+    <select id="findAllContact" resultMap="contactMap">
+        select * from rcontact
+    </select>
+
+    <resultMap id="dialogueMap" type="cn.reghao.hackwx.android.model.WxDialogue">
+        <result property="username" column="username"/>
+        <result property="alias" column="alias"/>
+        <result property="nickname" column="nickname"/>
+        <result property="conRemark" column="conRemark"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+    <select id="findAllDialogue" resultMap="dialogueMap">
+        select contact.username,contact.alias,contact.nickname,contact.conRemark,msg.content,max(msg.createTime) as createTime
+        from message msg
+        inner join rcontact contact
+        on msg.talker=contact.username
+        group by talker
+    </select>
+
+    <resultMap id="messageMap" type="cn.reghao.hackwx.android.model.WxMessage">
+        <result property="msgId" column="msgId"/>
+        <result property="createTime" column="createTime"/>
+        <result property="talker" column="talker"/>
+        <result property="content" column="content"/>
+    </resultMap>
+
+    <select id="findMessageByUsername" resultMap="messageMap">
+        select * from message msg
+        inner join rcontact contact
+        on msg.talker=contact.username
+        where contact.username=#{0}
+        limit 1000
+    </select>
+
+    <select id="findMessageByAlias" resultMap="messageMap">
+        select * from message msg
+        inner join rcontact contact
+        on msg.talker=contact.username
+        where contact.alias=#{0}
+        limit 1000
+    </select>
+</mapper>
